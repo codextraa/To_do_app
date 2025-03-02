@@ -1,0 +1,70 @@
+secrets:
+  infisical_token:
+    file: ./infisical_token.txt
+
+services:
+  backend:
+    container_name: todo-app-backend
+    build: ./backend
+    image: todo-app-backend:latest
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    secrets:
+      - infisical_token
+    entrypoint: /app/run.sh
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    container_name: todo-app-frontend
+    build: ./frontend
+    image: todo-app-frontend:latest
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    secrets:
+      - infisical_token
+    entrypoint: /app/run.sh
+
+  postgres:
+    build: ./postgres
+    container_name: todo-app-postgres
+    image: todo-app-postgres:latest
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    secrets:
+      - infisical_token
+    entrypoint: /app/run.sh
+    healthcheck:
+      test: ["CMD-SHELL", "/app/test.sh"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    build: ./redis
+    container_name: todo-app-redis
+    image: todo-app-redis:7
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  frontend_node_modules:
+  postgres-data:
+  redis-data:
