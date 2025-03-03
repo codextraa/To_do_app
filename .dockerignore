@@ -43,4 +43,5 @@ venv.bak/
 
 # Docker Compose and docs (optional)
 docker-compose.yaml
+.dockerignore
 *.md

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,8 +25,10 @@ SECRET_KEY = 'django-insecure-@to(-n3=3&zxlbxbis41ujf8+e+^$oqp!$op0w@ayhp#u405=p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["todo-app.dev.local", "localhost", "127.0.0.1"]
 
+# localhost or NGINX reverse proxy
+HTTPS = os.getenv('HTTPS') == 'True'
 
 # Application definition
 
@@ -75,8 +77,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
@@ -115,9 +121,45 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = '/app/static/'
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/app/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f"redis://{os.environ.get('REDIS_HOST')}:{os.environ.get('REDIS_PORT')}/1",
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+    }
+}
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://todo-app.dev.local",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# CSRF Settings
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",  
+    "http://127.0.0.1:3000",
+    "https://todo-app.dev.local",
+]
+
+CSRF_COOKIE_SECURE = True  # Ensures the CSRF cookie is sent only over HTTPS
+CSRF_COOKIE_HTTPONLY = True  # Must be False since JavaScript needs to read the token
+CSRF_COOKIE_SAMESITE = 'Lax' # Prevent cross-origin requests
+CSRF_COOKIE_AGE = 60 * 60 * 24 # 1 day
