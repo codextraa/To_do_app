@@ -36,7 +36,7 @@ infisical run --env=dev --path="/To-do-app/backend" -- sh -c '
   fi
 
   # Run migrations using the migrations script
-  sh /app/migrations.sh
+  # sh /app/migrations.sh
 
   # Run static files collection using the collect_static script
   # sh /app/collect_static.sh
