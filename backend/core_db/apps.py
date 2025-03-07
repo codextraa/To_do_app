@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class CoreDbConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'core_db'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "core_db"
