@@ -1,0 +1,95 @@
+name: Dev Environment Checks
+
+on:
+  push:
+    branches: [dev-branch]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-frontend:
+    name: Lint Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Matches package.json runtime
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci # Ensures exact versions from package-lock.json
+
+      - name: Lint with ESLint
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx eslint . --ext .js,.jsx,.ts,.tsx
+          else
+            npx eslint . --ext .js,.jsx,.ts,.tsx || true
+          fi
+        # Hard failure for PR, soft for push
+
+      - name: Check formatting with Prettier
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx prettier --check "**/*.{js,jsx,ts,tsx,css,json}"
+          else
+            npx prettier --check "**/*.{js,jsx,ts,tsx,css,json}" || true
+          fi
+        # Hard failure for PR, soft for push
+
+  lint-and-test-backend:
+    name: Lint and Test Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create network
+        run: docker network create to-do-app-network || true
+
+      - name: Create token file from GitHub secret
+        run: echo "${{ secrets.INFISICAL_TOKEN }}" > infisical_token.txt
+
+      - name: Build and start backend services
+        run: docker compose up -d --build todo-app-backend todo-app-redis
+
+      - name: Install linting dependencies
+        run: |
+          docker exec todo-app-backend sh -c "pip install black==25.1.0 pylint==3.3.4 pylint-django"
+        # Explicit versions from requirements.txt
+
+      - name: Lint backend code
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            docker exec todo-app-backend sh -c "cd /app && black --check --line-length 88 . && pylint --load-plugins=pylint_django --django-settings-module=backend.settings --disable=missing-docstring,invalid-name,no-member,too-few-public-methods backend backend_api"
+          else
+            docker exec todo-app-backend sh -c "cd /app && black --check --line-length 88 . || true && pylint --load-plugins=pylint_django --django-settings-module=backend.settings --disable=missing-docstring,invalid-name,no-member,too-few-public-methods backend backend_api || true"
+          fi
+        # Hard failure for PR, soft for push
+
+      - name: Run backend tests
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            docker exec todo-app-backend sh -c "cd /app && python manage.py test backend_api.tests --verbosity 2"
+          else
+            docker exec todo-app-backend sh -c "cd /app && python manage.py test backend_api.tests --verbosity 2 || true"
+          fi
+        # Hard failure for PR, soft for push
+
+      - name: Show logs if tests fail
+        if: failure()
+        run: docker compose logs todo-app-backend
+
+      - name: Stop containers and clean up
+        if: always()
+        run: |
+          docker compose down -v
+          docker network rm to-do-app-network || true
