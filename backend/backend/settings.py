@@ -11,20 +11,19 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
-from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-@to(-n3=3&zxlbxbis41ujf8+e+^$oqp!$op0w@ayhp#u405=p"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = ["todo-app.dev.local", "localhost", "127.0.0.1"]
 
@@ -36,6 +35,8 @@ HTTPS = os.getenv("HTTPS") == "True"
 INSTALLED_APPS = [
     "core_db",
     "backend_api",
+    "rest_framework",
+    "drf_spectacular",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -124,8 +125,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+# Static files
 STATIC_URL = "/static/"
-STATIC_ROOT = "/app/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Media files
 MEDIA_URL = "/media/"
@@ -166,3 +168,7 @@ CSRF_COOKIE_SECURE = True  # Ensures the CSRF cookie is sent only over HTTPS
 CSRF_COOKIE_HTTPONLY = True  # Must be False since JavaScript needs to read the token
 CSRF_COOKIE_SAMESITE = "Lax"  # Prevent cross-origin requests
 CSRF_COOKIE_AGE = 60 * 60 * 24  # 1 day
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": ("drf_spectacular.openapi.AutoSchema"),
+}
