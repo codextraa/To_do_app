@@ -65,7 +65,7 @@ jobs:
 
       - name: Check linting with Pylint
         run: |
-          docker exec todo-app-backend sh -c "cd /app && pylint --load-plugins=pylint_django --django-settings-module=backend.settings --disable=missing-docstring,invalid-name,no-member,too-few-public-methods backend backend_api"
+          docker exec todo-app-backend sh -c "cd /app && pylint --load-plugins=pylint_django --django-settings-module=backend.settings --disable=missing-docstring,invalid-name,no-member,too-few-public-methods,too-many-ancestors backend backend_api core_db"
 
       - name: Check code formatting with Black
         run: |

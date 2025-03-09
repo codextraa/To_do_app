@@ -23,6 +23,7 @@
         "--django-settings-module=backend.settings",
         "--disable=missing-docstring",
         "--disable=invalid-name",
+        "--disable=too-many-ancestors",
         "--disable=no-member",
         "--disable=too-few-public-methods"
     ],

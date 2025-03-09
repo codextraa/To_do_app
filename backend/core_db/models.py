@@ -11,4 +11,5 @@ class Todo(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
+        """String representation of the Todo model."""
         return f"{self.title}"
