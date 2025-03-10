@@ -4,9 +4,11 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
 from core_db.models import Todo
 from .serializers import TodoSerializer
+from .filters import TodoFilter
 
 
 class TodoViewSet(viewsets.ModelViewSet):
@@ -15,6 +17,8 @@ class TodoViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TodoFilter
 
     @action(detail=False, methods=["POST"], url_path="complete")
     def complete(self, request):
