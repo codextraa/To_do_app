@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "backend_api",
     "rest_framework",
     "drf_spectacular",
+    "django_filters",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -171,4 +172,6 @@ CSRF_COOKIE_AGE = 60 * 60 * 24  # 1 day
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": ("drf_spectacular.openapi.AutoSchema"),
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "ORDERING_PARAM": "ordering",
 }
