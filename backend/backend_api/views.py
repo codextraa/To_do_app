@@ -19,6 +19,7 @@ class TodoViewSet(viewsets.ModelViewSet):
     serializer_class = TodoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = TodoFilter
+    http_method_names = ["get", "post", "patch", "delete"]
 
     @action(detail=False, methods=["POST"], url_path="complete")
     def complete(self, request):
