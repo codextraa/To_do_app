@@ -14,6 +14,7 @@ export class ApiClient {
         "Content-Type": "application/json",
         ...(HTTPS && { Referer: process.env.NEXT_PUBLIC_BASE_HTTPS_URL }),
       },
+      credentials: "include",
     };
 
     if (data) {
