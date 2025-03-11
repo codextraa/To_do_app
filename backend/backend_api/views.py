@@ -34,3 +34,17 @@ class TodoViewSet(viewsets.ModelViewSet):
         todo.save()
 
         return Response(TodoSerializer(todo).data, status=200)
+
+    @action(detail=False, methods=["POST"], url_path="incomplete")
+    def incomplete(self, request):
+        """Marks a To-Do item as complete"""
+        todo_id = request.data.get("id")
+        if not todo_id:
+            return Response({"error": "ID is required"}, status=400)
+
+        todo = get_object_or_404(Todo, id=todo_id)
+        todo.completed = False
+        todo.completed_at = None
+        todo.save()
+
+        return Response(TodoSerializer(todo).data, status=200)

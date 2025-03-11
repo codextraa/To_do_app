@@ -29,5 +29,9 @@ export const deleteTask = async (id) => {
 };
 
 export const completeTask = async (id, data) => {
-  return apiClient.post(`/todos/${id}/`, data);
+  return apiClient.post(`/todos/${id}/complete/`, data);
+};
+
+export const incompleteTask = async (id, data) => {
+  return apiClient.post(`/todos/${id}/incomplete/`, data);
 };

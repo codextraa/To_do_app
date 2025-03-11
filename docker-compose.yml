@@ -46,6 +46,8 @@ services:
     secrets:
       - infisical_token
     entrypoint: /app/run.sh
+    extra_hosts:
+      - "todo-app.dev.local:host-gateway"
     develop:
       watch:
         - action: sync

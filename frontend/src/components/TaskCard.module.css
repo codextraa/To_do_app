@@ -1,0 +1,94 @@
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  flex: 1;
+}
+
+.title {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.completedTitle {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  color: #888;
+  text-decoration: line-through;
+}
+
+.dates {
+  font-size: 14px;
+  color: #666;
+}
+
+.dates p {
+  margin: 2px 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.updateButton {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.updateButton:hover {
+  background-color: #2563eb;
+}
+
+.completeButton {
+  background-color: #10b981;
+  color: white;
+}
+
+.completeButton:hover {
+  background-color: #059669;
+}
+
+.incompleteButton {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.incompleteButton:hover {
+  background-color: #d97706;
+}
+
+.deleteButton {
+  background-color: #ef4444;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #dc2626;
+}

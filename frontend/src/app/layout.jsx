@@ -1,8 +1,8 @@
 import "@/styles/globals.css";
 
 export const metadata = {
-  title: "TODO APP",
-  description: "Todo App created by Next.js and Django",
+  title: "Task Manager",
+  description: "Manage your tasks efficiently",
 };
 
 export default function RootLayout({ children }) {
