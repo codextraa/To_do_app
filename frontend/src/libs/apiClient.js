@@ -23,6 +23,15 @@ export class ApiClient {
 
     try {
       const response = await fetch(url, options);
+
+      if (response.status >= 400) {
+        console.log("Some Error Occured");
+        return null;
+      }
+
+      if (response.status == 204) {
+        return null;
+      }
       const responseData = await response.json();
       return responseData;
     } catch (error) {
