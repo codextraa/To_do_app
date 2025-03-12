@@ -1,14 +1,14 @@
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
 
 from core_db.models import Todo
-from .serializers import TodoSerializer
 from .filters import TodoFilter
+from .serializers import TodoSerializer
 
 
 class TodoViewSet(viewsets.ModelViewSet):
@@ -21,30 +21,20 @@ class TodoViewSet(viewsets.ModelViewSet):
     filterset_class = TodoFilter
     http_method_names = ["get", "post", "patch", "delete"]
 
-    @action(detail=False, methods=["POST"], url_path="complete")
-    def complete(self, request):
+    @action(detail=True, methods=["POST"], url_path="complete")
+    def complete(self, request, pk):
         """Marks a To-Do item as complete"""
-        todo_id = request.data.get("id")
-        if not todo_id:
-            return Response({"error": "ID is required"}, status=400)
-
-        todo = get_object_or_404(Todo, id=todo_id)
+        todo = get_object_or_404(Todo, id=pk)
         todo.completed = True
         todo.completed_at = now()
         todo.save()
-
         return Response(TodoSerializer(todo).data, status=200)
 
-    @action(detail=False, methods=["POST"], url_path="incomplete")
-    def incomplete(self, request):
-        """Marks a To-Do item as complete"""
-        todo_id = request.data.get("id")
-        if not todo_id:
-            return Response({"error": "ID is required"}, status=400)
-
-        todo = get_object_or_404(Todo, id=todo_id)
+    @action(detail=True, methods=["POST"], url_path="incomplete")
+    def incomplete(self, request, pk):
+        """Marks a To-Do item as incomplete"""
+        todo = get_object_or_404(Todo, id=pk)
         todo.completed = False
         todo.completed_at = None
         todo.save()
-
         return Response(TodoSerializer(todo).data, status=200)
