@@ -70,14 +70,21 @@ jobs:
           COMPOSE_PROJECT_NAME: to-do-app
           DOCKER_NETWORK: to-do-app-network
 
-      # Get the network ID of the postgres service
+      # Step 1: Get the actual postgres container name
+      - name: Get postgres container name
+        id: get_container
+        run: echo "container=${{ job.services.postgres.id }}" >> $GITHUB_OUTPUT
+
+      # Step 2: Get the network ID of the postgres container
       - name: Get postgres network
         id: get_network
-        run: echo "network=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' postgres)" >> $GITHUB_OUTPUT
+        run: |
+          NETWORK_ID=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' ${{ steps.get_container.outputs.container }})
+          echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
 
-      # Connect the todo-app-backend container to the postgres network
+      # Step 3: Connect the backend container to the postgres network
       - name: Connect backend to postgres network
-        run: docker network connect ${{ steps.get_network.outputs.network }} to-do-app_todo-app-backend_1
+        run: docker network connect ${{ steps.get_network.outputs.network }} todo-app-backend
 
       - name: Install linting dependencies
         run: |
