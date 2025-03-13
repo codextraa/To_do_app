@@ -38,6 +38,21 @@ jobs:
   lint-and-test-backend:
     name: Lint and Test Backend
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testuser"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,18 +64,28 @@ jobs:
         run: echo "${{ secrets.INFISICAL_TOKEN }}" > infisical_token.txt
 
       - name: Build and start backend services
-        run: docker compose up -d --build todo-app-backend todo-app-redis
+        working-directory: ./to-do-app
+        run: |
+          docker compose up -d --build todo-app-backend todo-app-redis
+        env:
+          COMPOSE_PROJECT_NAME: to-do-app
+          DOCKER_NETWORK: to-do-app-network
+
+      - name: Connect backend to network
+        run: docker network connect to-do-app-network todo-app-backend
 
       - name: Install linting dependencies
         run: |
           docker exec todo-app-backend sh -c "pip install black==25.1.0 pylint==3.3.4 pylint-django"
 
-      - name: Run backend tests
+      - name: Run backend tests with overridden database variables
+        working-directory: ./to-do-app
         run: |
-          docker exec todo-app-backend sh -c "cd /app && export INFISICAL_TOKEN=\$(cat /run/secrets/infisical_token) && infisical run --env=dev --path='/To-do-app/backend' python manage.py test"
+          docker exec todo-app-backend sh -c "cd /app && export INFISICAL_TOKEN=\$(cat /run/secrets/infisical_token) && export DB_HOST=localhost && export DB_NAME=testdb && export DB_USER=testuser && export DB_PASSWORD=testpass && export DB_PORT=5432 && infisical run --env=dev --path='/To-do-app/backend' python manage.py test"
 
       - name: Show logs if tests fail
         if: failure()
+        working-directory: ./to-do-app
         run: docker logs todo-app-backend
 
       - name: Check linting with Pylint
@@ -73,6 +98,7 @@ jobs:
 
       - name: Stop containers and clean up
         if: always()
+        working-directory: ./to-do-app
         run: |
           docker compose down -v
           docker network rm to-do-app-network || true
