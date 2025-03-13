@@ -70,6 +70,15 @@ jobs:
           COMPOSE_PROJECT_NAME: to-do-app
           DOCKER_NETWORK: to-do-app-network
 
+      # Get the network ID of the postgres service
+      - name: Get postgres network
+        id: get_network
+        run: echo "network=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.NetworkID}}{{end}}' postgres)" >> $GITHUB_OUTPUT
+
+      # Connect the todo-app-backend container to the postgres network
+      - name: Connect backend to postgres network
+        run: docker network connect ${{ steps.get_network.outputs.network }} to-do-app_todo-app-backend_1
+
       - name: Install linting dependencies
         run: |
           docker exec todo-app-backend sh -c "pip install black==25.1.0 pylint==3.3.4 pylint-django"
