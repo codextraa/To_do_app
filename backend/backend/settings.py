@@ -12,11 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 
-print(os.getenv("DB_NAME"))
-print(os.getenv("DB_USER"))
-print(os.getenv("DB_PASSWORD"))
-print(os.getenv("DB_HOST"))
-print(os.getenv("DB_PORT"))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
