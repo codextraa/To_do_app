@@ -76,9 +76,7 @@ jobs:
 
       - name: Run backend tests with test database variables
         run: |
-          docker exec todo-app-backend sh -c "cd /app && export INFISICAL_TOKEN=\$(cat /run/secrets/infisical_token) 
-          && export DB_HOST=localhost && export DB_NAME=testdb && export DB_USER=testuser && export DB_PASSWORD=testpass 
-          && export DB_PORT=5432 && infisical run --env=dev --path='/To-do-app/backend' python manage.py test"
+          docker exec todo-app-backend sh -c "cd /app && export INFISICAL_TOKEN=\$(cat /run/secrets/infisical_token) && export DB_HOST=localhost && export DB_NAME=testdb && export DB_USER=testuser && export DB_PASSWORD=testpass && export DB_PORT=5432 && infisical run --env=dev --path='/To-do-app/backend' python manage.py test"
 
       - name: Show logs if tests fail
         if: failure()
