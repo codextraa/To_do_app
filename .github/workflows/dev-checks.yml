@@ -39,16 +39,34 @@ jobs:
     name: Lint and Test Backend
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout To-Do app repository
         uses: actions/checkout@v4
+
+      - name: Checkout Postgres repository
+        uses: actions/checkout@v4
+        with:
+          repository: wasee-sun/postgres-db
+          token: ${{ secrets.POSTGRES_REPO_PAT }}
+          path: postgres-db
+
+      - name: Create token file for To-Do app
+        run: echo "${{ secrets.INFISICAL_TOKEN }}" > infisical_token.txt
+
+      - name: Create token file for Postgres
+        run: echo "${{ secrets.INFISICAL_TOKEN_POSTGRES }}" > postgres-db/infisical_token.txt
 
       - name: Create network
         run: docker network create to-do-app-network || true
 
-      - name: Create token file from GitHub secret
-        run: echo "${{ secrets.INFISICAL_TOKEN }}" > infisical_token.txt
+      - name: Start Postgres service
+        working-directory: ./postgres-db
+        run: docker compose up -d --build
 
-      - name: Build and start backend services
+      - name: Wait for Postgres to be healthy
+        run: |
+          timeout 120s bash -c 'until [ "$(docker inspect --format="{{.State.Health.Status}}" postgres-db)" = "healthy" ]; do echo "Waiting for Postgres to be healthy..."; sleep 5; done' || { echo "Postgres failed to become healthy within 2 minutes"; exit 1; }
+
+      - name: Start backend and Redis services
         run: docker compose up -d --build todo-app-backend todo-app-redis
 
       - name: Install linting dependencies
@@ -71,12 +89,21 @@ jobs:
         run: |
           docker exec todo-app-backend sh -c "cd /app && black --check ."
 
-      - name: Stop containers and clean up
+      - name: Stop To-Do app containers
+        if: always()
+        run: docker compose down -v
+
+      - name: Stop Postgres containers
+        if: always()
+        working-directory: ./postgres-db
+        run: docker compose down -v
+
+      - name: Remove network
+        if: always()
+        run: docker network rm to-do-app-network || true
+
+      - name: Remove token files
         if: always()
         run: |
-          docker compose down -v
-          docker network rm to-do-app-network || true
-
-      - name: Remove token file
-        if: always()
-        run: rm infisical_token.txt
+          rm infisical_token.txt || true
+          rm postgres-db/infisical_token.txt || true
