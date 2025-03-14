@@ -67,9 +67,9 @@ jobs:
       - name: Create network
         run: docker network create to-do-app-network || true
 
-      - name: Start Postgres service
-        working-directory: ./postgres-db
-        run: docker compose up -d --build
+      # - name: Start Postgres service
+      #   working-directory: ./postgres-db
+      #   run: docker compose up -d --build
 
       - name: Check Postgres logs
         run: docker logs postgres-db
