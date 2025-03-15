@@ -16,7 +16,8 @@ build/
 .gitignore
 
 # Infisical secrets
-infisical_token.txt
+infisical*
+.infisical*
 
 # Logs and temp files
 *.log

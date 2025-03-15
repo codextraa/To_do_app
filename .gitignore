@@ -8,4 +8,5 @@ env.bak/
 venv.bak/
 
 # Infisical
-infisical_token.txt
+infisical*
+.infisical*

@@ -1,7 +1,8 @@
 #!/bin/bash
 export INFISICAL_TOKEN=$(cat /run/secrets/infisical_token)
-
-infisical run --env=dev --path="/To-do-app/backend" -- sh -c '
+cd /run/secrets
+infisical run --path="/To-do-app/backend" -- sh -c '
+  cd /app &&
   # Test PostgreSQL connection with retry and fallback
   echo "Testing connection to PostgreSQL server at $DB_HOST:$DB_PORT..."
   retries=5
