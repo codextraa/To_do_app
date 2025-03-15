@@ -63,6 +63,9 @@ jobs:
         run: |
           printf '%s' "${{ secrets.INFISICAL_PROJECT_JSON_POSTGRES }}" > postgres-db/.infisical.json
 
+      - name: cat infisical project json
+        run: cat .infisical.json
+
       - name: Create network
         run: docker network create to-do-app-network || true
 
