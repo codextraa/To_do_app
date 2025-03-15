@@ -64,6 +64,10 @@ jobs:
         run: |
           echo "${{ secrets.INFISICAL_PROJECT_JSON_POSTGRES }}" | base64 -d > .infisical.json
 
+      - name: Output infisical json postgres
+        working-directory: ./postgres-db
+        run: cat .infisical.json
+
       - name: Create network
         run: docker network create to-do-app-network || true
 
