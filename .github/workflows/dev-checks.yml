@@ -54,14 +54,14 @@ jobs:
 
       - name: Create Infisical config for To-Do app
         run: |
-          echo "${{ secrets.INFISICAL_PROJECT_JSON }}" > .infisical.json
+          printf '%s' "${{ secrets.INFISICAL_PROJECT_JSON }}" > .infisical.json
 
       - name: Create token file for Postgres
         run: echo "${{ secrets.INFISICAL_TOKEN_POSTGRES }}" > postgres-db/infisical_token.txt
 
       - name: Create Infisical config for Postgres
         run: |
-          echo "${{ secrets.INFISICAL_PROJECT_JSON_POSTGRES }}" > postgres-db/.infisical.json
+          printf '%s' "${{ secrets.INFISICAL_PROJECT_JSON_POSTGRES }}" > postgres-db/.infisical.json
 
       - name: Create network
         run: docker network create to-do-app-network || true
@@ -74,9 +74,9 @@ jobs:
         run: |
           docker logs postgres-db
 
-      # - name: Wait for Postgres to be healthy
-      #   run: |
-      #     timeout 120s bash -c 'until [ "$(docker inspect --format="{{.State.Health.Status}}" postgres-db)" = "healthy" ]; do echo "Waiting for Postgres to be healthy..."; sleep 5; done' || { echo "Postgres failed to become healthy within 2 minutes"; exit 1; }
+      - name: Wait for Postgres to be healthy
+        run: |
+          timeout 120s bash -c 'until [ "$(docker inspect --format="{{.State.Health.Status}}" postgres-db)" = "healthy" ]; do echo "Waiting for Postgres to be healthy..."; sleep 5; done' || { echo "Postgres failed to become healthy within 2 minutes"; exit 1; }
 
       - name: Start backend and Redis services
         run: docker compose up -d --build todo-app-backend todo-app-redis
