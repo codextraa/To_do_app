@@ -54,17 +54,15 @@ jobs:
 
       - name: Create Infisical config for To-Do app
         run: |
-          printf '%s' "${{ secrets.INFISICAL_PROJECT_JSON }}" > .infisical.json
+          echo "${{ secrets.INFISICAL_PROJECT_JSON_POSTGRES_BASE64 }}" | base64 -d > .infisical.json
 
       - name: Create token file for Postgres
         run: echo "${{ secrets.INFISICAL_TOKEN_POSTGRES }}" > postgres-db/infisical_token.txt
 
       - name: Create Infisical config for Postgres
+        working-directory: ./postgres-db
         run: |
-          printf '%s' "${{ secrets.INFISICAL_PROJECT_JSON_POSTGRES }}" > postgres-db/.infisical.json
-
-      - name: cat infisical project json
-        run: cat .infisical.json
+          echo "${{ secrets.INFISICAL_PROJECT_JSON_POSTGRES_BASE64 }}" | base64 -d > .infisical.json
 
       - name: Create network
         run: docker network create to-do-app-network || true
