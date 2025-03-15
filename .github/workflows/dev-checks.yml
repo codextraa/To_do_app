@@ -69,11 +69,14 @@ jobs:
 
       - name: Start Postgres service
         working-directory: ./postgres-db
-        run: docker compose up --build
+        run: docker compose up -d --build
 
-      - name: Check Postgres log
+      - name: Print running containers
+        run: docker ps
+
+      - name: Print health status
         run: |
-          docker logs postgres-db
+          docker inspect --format='{{json .State.Health.Status}}' postgres-db
 
       - name: Wait for Postgres to be healthy
         run: |
