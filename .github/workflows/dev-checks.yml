@@ -71,12 +71,13 @@ jobs:
         working-directory: ./postgres-db
         run: docker compose up -d --build
 
-      - name: Print running containers
-        run: docker ps
-
-      - name: Print health status
+      - name: Print running containers in a loop with 5 seconds sleep for 120 seconds
         run: |
-          docker inspect --format='{{json .State.Health.Status}}' postgres-db
+          for i in $(seq 1 12); do
+            docker ps
+            docker logs postgres-db
+            sleep 5
+          done
 
       - name: Wait for Postgres to be healthy
         run: |
