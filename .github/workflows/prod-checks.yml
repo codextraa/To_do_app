@@ -6,7 +6,7 @@ on:
       - prod-branch
 
 jobs:
-  check-files:
+  check-allowed-merge-files:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
