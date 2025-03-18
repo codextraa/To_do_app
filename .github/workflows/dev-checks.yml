@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - dev-branch
-  pull_request:
-    branches:
-      - stage-prod-branch
 
 jobs:
   lint-frontend:
