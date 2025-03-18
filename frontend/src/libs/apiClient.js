@@ -12,6 +12,7 @@ export class ApiClient {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        "NEXT-X-API-KEY": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         ...(HTTPS && { Referer: process.env.NEXT_PUBLIC_BASE_HTTPS_URL }),
       },
       credentials: "include",
