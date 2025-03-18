@@ -7,6 +7,7 @@ on:
 
 jobs:
   check-allowed-merge-files:
+    name: Check Allowed Merge Files
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
