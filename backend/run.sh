@@ -1,8 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 export INFISICAL_TOKEN=$(cat /run/secrets/infisical_token)
 cd /run/secrets
 infisical run --path="/To-do-app/backend" -- sh -c '
   cd /app &&
+  
   # Test PostgreSQL connection with retry and fallback
   echo "Testing connection to PostgreSQL server at $DB_HOST:$DB_PORT..."
   retries=5
@@ -40,7 +41,14 @@ infisical run --path="/To-do-app/backend" -- sh -c '
   echo "Migrating to database..."
   python manage.py migrate
 
-  # Start the Django server
-  echo "Starting Django development server..."
-  python manage.py runserver 0.0.0.0:8000
+  # Check environment and start appropriate server
+  if [ "$DJANGO_ENV" = "production" ]; then
+    # Start Gunicorn in production mode
+    echo "Starting Gunicorn production server..."
+    gunicorn backend.wsgi:application --bind 0.0.0.0:8000 --workers=4 --threads=2 --timeout=120
+  else
+    # Start Django development server
+    echo "Starting Django development server..."
+    python manage.py runserver 0.0.0.0:8000
+  fi
 '

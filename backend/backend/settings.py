@@ -25,6 +25,10 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG")
 
+# Django environment
+DJANGO_ENV = os.environ.get("DJANGO_ENV")
+
+# ALOWED_HOSTS based on Django environment
 ALLOWED_HOSTS = ["todo-app.dev.local", "localhost", "127.0.0.1"]
 
 # localhost or NGINX reverse proxy

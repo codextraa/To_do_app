@@ -2,7 +2,7 @@
 
 **Welcome to the Todo List App**, a fullstack web application built with **Next.js** for the frontend and **Django REST Framework** for the backend, utilizing **REST** APIs and a **Postgres** database. This project provides a simple and efficient way to manage tasks with a clean interface and robust backend functionality. Create, update, delete, and track the completion status of todo items seamlessly.
 
-For more details, visit the [GitHub repository](https://github.com/wasee-sun/To_do_app) (replace with your actual repository URL).
+For more details, visit the [GitHub repository](https://github.com/wasee-sun/To_do_app).
 
 ## Features
 
@@ -80,8 +80,8 @@ The API provides endpoints for managing todo items efficiently. Below is a summa
 3. Prefer `/complete/` and `/incomplete/` endpoints over PATCH for status updates to maintain semantic clarity.
 4. Monitor server responses and retry on transient errors (e.g., 500 Internal Server Error).
 
-For detailed request and response formats, refer to the [API Documentation](https://github.com/wasee-sun/To_do_app/blob/main/Api-docxs.pdf) (link to your attached document or a hosted version).
+For detailed request and response formats, refer to the [API Documentation](https://github.com/wasee-sun/To_do_app/blob/main/Api-docxs.pdf).
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/wasee-sun/To_do_app/blob/main/LICENSE) file for details (replace with your actual repository URL).
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/wasee-sun/To_do_app/blob/main/LICENSE) file for details.

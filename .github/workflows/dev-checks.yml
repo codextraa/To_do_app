@@ -2,9 +2,11 @@ name: Dev Environment Checks
 
 on:
   push:
-    branches: [dev-branch]
+    branches:
+      - dev-branch
   pull_request:
-    branches: [main]
+    branches:
+      - prod-branch
 
 jobs:
   lint-frontend:
@@ -20,12 +22,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Matches package.json runtime
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: './frontend/package-lock.json'
 
       - name: Install dependencies
-        run: npm ci # Ensures exact versions from package-lock.json
+        run: npm ci
 
       - name: Check linting with ESLint
         run: |
@@ -50,22 +52,22 @@ jobs:
           path: postgres-db
 
       - name: Create token file for To-Do app
-        run: echo "${{ secrets.INFISICAL_TOKEN }}" > infisical_token.txt
+        run: echo "${{ secrets.INFISICAL_TOKEN_DEV }}" > infisical_token.txt
 
       - name: Create Infisical config for To-Do app
         run: |
-          echo "${{ secrets.INFISICAL_PROJECT_JSON }}" | base64 -d > .infisical.json
+          echo "${{ secrets.INFISICAL_JSON_DEV }}" | base64 -d > .infisical.json
 
       - name: Create token file for Postgres
-        run: echo "${{ secrets.INFISICAL_TOKEN_POSTGRES }}" > postgres-db/infisical_token.txt
+        run: echo "${{ secrets.INFISICAL_TOKEN_POSTGRES_DEV }}" > postgres-db/infisical_token.txt
 
       - name: Create Infisical config for Postgres
         working-directory: ./postgres-db
         run: |
-          echo "${{ secrets.INFISICAL_PROJECT_JSON_POSTGRES }}" | base64 -d > .infisical.json
+          echo "${{ secrets.INFISICAL_JSON_POSTGRES_DEV }}" | base64 -d > .infisical.json
 
       - name: Create network
-        run: docker network create to-do-app-network || true
+        run: docker network create web-app-network || true
 
       - name: Start Postgres service
         working-directory: ./postgres-db
