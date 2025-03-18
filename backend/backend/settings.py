@@ -29,7 +29,7 @@ DEBUG = os.environ.get("DEBUG")
 DJANGO_ENV = os.environ.get("DJANGO_ENV")
 
 # ALOWED_HOSTS based on Django environment
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 
 # NEXT_API_SECRET_KEY
 NEXT_API_SECRET_KEY = os.getenv("NEXT_API_SECRET_KEY")
