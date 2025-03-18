@@ -29,7 +29,10 @@ DEBUG = os.environ.get("DEBUG")
 DJANGO_ENV = os.environ.get("DJANGO_ENV")
 
 # ALOWED_HOSTS based on Django environment
-ALLOWED_HOSTS = ["todo-app.dev.local", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
+
+# NEXT_API_SECRET_KEY
+NEXT_API_SECRET_KEY = os.getenv("NEXT_API_SECRET_KEY")
 
 # localhost or NGINX reverse proxy
 HTTPS = os.getenv("HTTPS") == "True"
@@ -58,6 +61,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "backend.middlewares.resdirapimiddleware.RestrictDirectApiMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -132,11 +136,19 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+if HTTPS:
+    STATIC_ROOT = "/app/static"
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Media files
 MEDIA_URL = "/media/"
-MEDIA_ROOT = "/app/media/"
+
+if HTTPS:
+    MEDIA_ROOT = "/app/media"
+else:
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
