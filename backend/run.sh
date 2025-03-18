@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 export INFISICAL_TOKEN=$(cat /run/secrets/infisical_token)
 cd /run/secrets
 infisical run --path="/To-do-app/backend" -- sh -c '
