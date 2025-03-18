@@ -3,7 +3,8 @@ name: Production Check
 on:
   pull_request:
     branches:
-      - prod-branch
+      - stage-prod-branch
+      - main
 
 jobs:
   check-allowed-merge-files:
