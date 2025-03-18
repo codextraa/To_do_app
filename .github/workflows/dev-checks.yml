@@ -6,7 +6,7 @@ on:
       - dev-branch
   pull_request:
     branches:
-      - prod-branch
+      - stage-prod-branch
 
 jobs:
   lint-frontend:
