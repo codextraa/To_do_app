@@ -1,4 +1,3 @@
-from core_db.models import BgImage, Todo
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django_filters.rest_framework import DjangoFilterBackend
@@ -8,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from core_db.models import BgImage, Todo
 from .filters import TodoFilter
 from .serializers import BgImageSerializer, TodoSerializer
 
@@ -272,7 +272,8 @@ class BgImageViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Get All BgImages(Not Supported)",
-        description="This endpoint is not supported. Use GET with an ID to retrieve a specific BgImage.",
+        description="""This endpoint is not supported.
+        Use GET with an ID to retrieve a specific BgImage.""",
         responses={
             405: OpenApiResponse(
                 description="Method Not Allowed",
@@ -281,7 +282,8 @@ class BgImageViewSet(viewsets.ModelViewSet):
                     "properties": {
                         "errors": {
                             "type": "string",
-                            "example": "Method not allowed. Use GET with an ID to retrieve a specific BgImage.",
+                            "example": """Method not allowed. 
+                            Use GET with an ID to retrieve a specific BgImage.""",
                         }
                     },
                 },

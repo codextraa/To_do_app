@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { fetchTasks } from '@/actions/taskActions';
-import { getBgImage } from '@/actions/bgImageActions';
-import Header from '@/components/Header';
-import SearchBar from '@/components/SearchBar';
-import FilterToggle from '@/components/FilterToggle';
-import CreateButton from '@/components/CreateButton';
-import ChangeBackgroundButton from '@/components/ChangeBackgroundButton';
-import TaskCard from '@/components/TaskCard';
-import TaskModal from '@/components/TaskModal';
-import styles from './page.module.css';
+import { useState, useEffect } from "react";
+import { fetchTasks } from "@/actions/taskActions";
+import { getBgImage } from "@/actions/bgImageActions";
+import Header from "@/components/Header";
+import SearchBar from "@/components/SearchBar";
+import FilterToggle from "@/components/FilterToggle";
+import CreateButton from "@/components/CreateButton";
+import ChangeBackgroundButton from "@/components/ChangeBackgroundButton";
+import TaskCard from "@/components/TaskCard";
+import TaskModal from "@/components/TaskModal";
+import styles from "./page.module.css";
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
-  const [backgroundImage, setBackgroundImage] = useState('');
+  const [backgroundImage, setBackgroundImage] = useState("");
 
   const loadTasks = async () => {
     setIsLoading(true);
@@ -29,7 +29,7 @@ export default function TasksPage() {
       const data = await fetchTasks(queryParams);
       setTasks(data);
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      console.error("Error fetching tasks:", error);
     } finally {
       setIsLoading(false);
     }
@@ -42,7 +42,7 @@ export default function TasksPage() {
         setBackgroundImage(data.image);
       }
     } catch (error) {
-      console.error('Error fetching background image:', error);
+      console.error("Error fetching background image:", error);
     }
   };
 
@@ -99,8 +99,8 @@ export default function TasksPage() {
   const containerStyle = backgroundImage
     ? {
         backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }
     : {};
 
@@ -124,8 +124,8 @@ export default function TasksPage() {
           <div className={styles.taskList}>
             {tasks.length === 0 ? (
               <div className={styles.noTasks}>
-                No tasks found.{' '}
-                {!isCompleted && 'Create a new task to get started!'}
+                No tasks found.{" "}
+                {!isCompleted && "Create a new task to get started!"}
               </div>
             ) : (
               tasks.map((task) => (

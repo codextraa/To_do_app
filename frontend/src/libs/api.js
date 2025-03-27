@@ -1,6 +1,6 @@
-import { ApiClient } from './apiClient';
+import { ApiClient } from "./apiClient";
 
-const HTTPS = process.env.HTTPS == 'true';
+const HTTPS = process.env.HTTPS == "true";
 const API_URL = HTTPS
   ? process.env.API_BASE_HTTPS_URL
   : process.env.API_BASE_URL;
