@@ -137,19 +137,15 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = "/static/"
-
-if HTTPS:
-    STATIC_ROOT = "/app/static"
-else:
-    STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = "/app/static"
 
 # Media files
 if DJANGO_ENV == "development":
-    MEDIA_URL = "/media/"
     if HTTPS:
-        MEDIA_ROOT = "/app/media"
+        MEDIA_URL = "https://todo-app.dev.local/media/"
     else:
-        MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+        MEDIA_URL = "/media/"
+    MEDIA_ROOT = "/app/media"
 else:
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")

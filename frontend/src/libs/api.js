@@ -1,6 +1,6 @@
-import { ApiClient } from "./apiClient";
+import { ApiClient } from './apiClient';
 
-const HTTPS = process.env.HTTPS == "true";
+const HTTPS = process.env.HTTPS == 'true';
 const API_URL = HTTPS
   ? process.env.API_BASE_HTTPS_URL
   : process.env.API_BASE_URL;
@@ -34,4 +34,12 @@ export const completeTask = async (id, data) => {
 
 export const incompleteTask = async (id, data) => {
   return apiClient.post(`/todos/${id}/incomplete/`, data);
+};
+
+export const getBgImage = async () => {
+  return apiClient.get(`/bgimages/1/`);
+};
+
+export const changeBgImage = async (data) => {
+  return apiClient.patch(`/bgimages/1/`, data, true);
 };
