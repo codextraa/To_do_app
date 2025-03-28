@@ -62,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "backend.middlewares.resdirapimiddleware.RestrictDirectApiMiddleware",
+    "backend.middlewares.RestrictDirectApiMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -200,3 +200,7 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "ORDERING_PARAM": "ordering",
 }
+
+# NGINX Proxy Settings
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
