@@ -59,10 +59,10 @@ jobs:
             done
 
             # Build the Docker image
-            docker-compose build
+            docker-compose -p to_do_app build
 
             # Run the app containers
-            docker-compose up -d
+            docker-compose -p to_do_app up -d
 
             # Wait for app containers to be healthy
             timeout 120s bash -c "until docker-compose ps | grep -E 'todo-app-frontend|todo-app-backend|todo-app-redis' | grep -q 'Up (healthy)'; do sleep 10s; done" || { 
