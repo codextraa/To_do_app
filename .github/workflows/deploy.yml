@@ -1,0 +1,96 @@
+name: Deploy To-Do app in AWS EC2 instance
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed # Trigger only when PR is closed (merged)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only run if the PR was merged
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Set up a temporary directory
+            TEMP_DIR=$(mktemp -d /home/ubuntu/tmp.XXXXXX)
+            cd "$TEMP_DIR"
+
+            # Clone the repository
+            git clone https://github.com/wasee-sun/To_do_app.git .
+
+            # Write secrets to files
+            echo "${{ secrets.INFISICAL_TOKEN_PROD }}" > infisical_token.txt
+            echo "${{ secrets.INFISICAL_JSON_PROD }}" | base64 -d > .infisical.json
+            chmod 600 infisical_token.txt .infisical.json
+
+            # Ensure network exists
+            docker network ls | grep -q web-app-network || docker network create web-app-network
+
+            # Stop nginx if it exists
+            if docker ps -a --format '{{.Names}}' | grep -q "^nginx$"; then
+              echo "Stopping nginx container"
+              docker stop nginx || true
+            fi
+
+            # Check and remove existing app containers if they exist
+            for container in todo-app-frontend todo-app-backend todo-app-redis; do
+              if docker ps -a --format '{{.Names}}' | grep -q "^${container}$"; then
+                echo "Stopping and removing container: $container"
+                docker stop "$container" || true
+                docker rm "$container" || true
+              fi
+            done
+
+            # Check and remove existing volumes if they exist
+            for volume in to_do_app_backend-static to_do_app_redis-data; do
+              if docker volume ls --format '{{.Name}}' | grep -q "^${volume}$"; then
+                echo "Removing volume: $volume"
+                docker volume rm "$volume" || true
+              fi
+            done
+
+            # Build the Docker image
+            docker-compose build
+
+            # Run the app containers
+            docker-compose up -d
+
+            # Wait for app containers to be healthy
+            timeout 120s bash -c "until docker-compose ps | grep -E 'todo-app-frontend|todo-app-backend|todo-app-redis' | grep -q 'Up (healthy)'; do sleep 10s; done" || { 
+              echo "App containers failed to start"; 
+              docker stop todo-app-frontend todo-app-backend todo-app-redis || true; 
+              docker rm todo-app-frontend todo-app-backend todo-app-redis || true; 
+              exit 1; 
+            }
+
+            # Restart nginx container
+            if docker ps -a --format '{{.Names}}' | grep -q "^nginx$"; then
+              echo "Starting nginx container"
+              docker start nginx || { 
+                echo "Failed to start nginx"; 
+                exit 1; 
+              }
+              # Wait for nginx to be up (only if it exists)
+              timeout 60s bash -c "until docker ps | grep 'nginx' | grep -q 'Up'; do sleep 5s; done" || { 
+                echo "Nginx failed to start"; 
+                docker stop nginx || true; 
+                exit 1; 
+              }
+            else
+              echo "Nginx container not found, skipping restart"
+            fi
+
+            # Cleanup
+            cd /home/ubuntu
+            rm -f "$TEMP_DIR/infisical_token.txt"
+            rm -f "$TEMP_DIR/.infisical.json"
+            rm -rf "$TEMP_DIR"
