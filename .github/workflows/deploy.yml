@@ -59,7 +59,7 @@ jobs:
             done
 
             # # Build the Docker image
-            # docker-compose -p to_do_app build
+            docker-compose -p to_do_app build
 
             # Run the app containers
             docker-compose -p to_do_app up -d
