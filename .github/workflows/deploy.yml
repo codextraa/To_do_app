@@ -65,8 +65,9 @@ jobs:
             docker-compose -p to_do_app up -d
 
             # Wait for app containers to be healthy
-            timeout 120s bash -c "until docker-compose ps | grep -E 'todo-app-frontend|todo-app-backend|todo-app-redis' | grep -q 'Up (healthy)'; do sleep 10s; done" || { 
+            timeout 60s bash -c "until docker-compose ps | grep -E 'todo-app-frontend|todo-app-backend|todo-app-redis' | grep -q 'Up (healthy)'; do sleep 10s; done" || { 
               echo "App containers failed to start"; 
+              docker logs todo-app-frontend todo-app-backend todo-app-redis || true;
               docker stop todo-app-frontend todo-app-backend todo-app-redis || true; 
               docker rm todo-app-frontend todo-app-backend todo-app-redis || true; 
               exit 1; 
