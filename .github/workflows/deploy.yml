@@ -58,8 +58,8 @@ jobs:
               fi
             done
 
-            # Build the Docker image
-            docker-compose -p to_do_app build
+            # # Build the Docker image
+            # docker-compose -p to_do_app build
 
             # Run the app containers
             docker-compose -p to_do_app up -d
@@ -67,7 +67,9 @@ jobs:
             # Wait for app containers to be healthy
             timeout 60s bash -c "until docker-compose ps | grep -E 'todo-app-frontend|todo-app-backend|todo-app-redis' | grep -q 'Up (healthy)'; do sleep 10s; done" || { 
               echo "App containers failed to start"; 
-              docker logs todo-app-frontend todo-app-backend todo-app-redis || true;
+              docker logs todo-app-frontend; 
+              docker logs todo-app-backend; 
+              docker logs todo-app-redis; 
               docker stop todo-app-frontend todo-app-backend todo-app-redis || true; 
               docker rm todo-app-frontend todo-app-backend todo-app-redis || true; 
               exit 1; 
