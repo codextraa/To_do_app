@@ -64,16 +64,38 @@ jobs:
             # Run the app containers
             docker-compose -p to_do_app up -d
 
-            # Wait for app containers to be healthy
-            timeout 60s bash -c "until docker-compose ps | grep -E 'todo-app-frontend|todo-app-backend|todo-app-redis' | grep -q 'Up (healthy)'; do sleep 10s; done" || { 
-              echo "App containers failed to start"; 
-              docker logs todo-app-frontend; 
-              docker logs todo-app-backend; 
+            # Wait for todo-app-redis to be ready
+            echo "Waiting for Redis to be ready..."
+            timeout 60s bash -c "until docker exec todo-app-redis redis-cli ping | grep -q 'PONG'; do echo 'Redis not ready yet...'; sleep 5s; done" || { 
+              echo "Redis failed to start"; 
               docker logs todo-app-redis; 
-              docker stop todo-app-frontend todo-app-backend todo-app-redis || true; 
-              docker rm todo-app-frontend todo-app-backend todo-app-redis || true; 
+              docker stop todo-app-redis || true; 
+              docker rm todo-app-redis || true; 
               exit 1; 
             }
+            echo "Redis is ready!"
+
+            # Wait for todo-app-frontend to be ready
+            echo "Waiting for Frontend to be ready..."
+            timeout 60s bash -c "until curl -s -f http://localhost:3000/ > /dev/null; do echo 'Frontend not ready yet...'; sleep 5s; done" || { 
+              echo "Frontend failed to start"; 
+              docker logs todo-app-frontend; 
+              docker stop todo-app-frontend || true; 
+              docker rm todo-app-frontend || true; 
+              exit 1; 
+            }
+            echo "Frontend is ready!"
+
+            # Wait for todo-app-backend to be ready
+            echo "Waiting for Backend to be ready..."
+            timeout 60s bash -c "until nc -z localhost 8000; do echo 'Backend not ready yet...'; sleep 5s; done" || { 
+              echo "Backend failed to start"; 
+              docker logs todo-app-backend; 
+              docker stop todo-app-backend || true; 
+              docker rm todo-app-backend || true; 
+              exit 1; 
+            }
+            echo "Backend is ready!"
 
             # Restart nginx container
             if docker ps -a --format '{{.Names}}' | grep -q "^nginx$"; then
@@ -82,12 +104,15 @@ jobs:
                 echo "Failed to start nginx"; 
                 exit 1; 
               }
-              # Wait for nginx to be up (only if it exists)
-              timeout 60s bash -c "until docker ps | grep 'nginx' | grep -q 'Up'; do sleep 5s; done" || { 
+              # Wait for nginx to be ready
+              echo "Waiting for Nginx to be ready..."
+              timeout 60s bash -c "until curl -s -f http://localhost:80/ > /dev/null; do echo 'Nginx not ready yet...'; sleep 5s; done" || { 
                 echo "Nginx failed to start"; 
+                docker logs nginx; 
                 docker stop nginx || true; 
                 exit 1; 
               }
+              echo "Nginx is ready!"
             else
               echo "Nginx container not found, skipping restart"
             fi
