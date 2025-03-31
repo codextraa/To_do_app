@@ -37,8 +37,9 @@ jobs:
 
             # Stop nginx if it exists
             if docker ps -a --format '{{.Names}}' | grep -q "^nginx$"; then
-              echo "Stopping nginx container"
+              echo "Stopping and removing nginx container"
               docker stop nginx || true
+              docker rm nginx || true
             fi
 
             # Check and remove existing app containers if they exist
@@ -97,25 +98,53 @@ jobs:
             }
             echo "Backend is ready!"
 
-            # Restart nginx container
-            if docker ps -a --format '{{.Names}}' | grep -q "^nginx$"; then
-              echo "Starting nginx container"
-              docker start nginx || { 
-                echo "Failed to start nginx"; 
-                exit 1; 
-              }
-              # Wait for nginx to be ready
-              echo "Waiting for Nginx to be ready..."
-              timeout 60s bash -c "until curl -s -f http://localhost:80/ > /dev/null; do echo 'Nginx not ready yet...'; sleep 5s; done" || { 
-                echo "Nginx failed to start"; 
-                docker logs nginx; 
-                docker stop nginx || true; 
-                exit 1; 
-              }
-              echo "Nginx is ready!"
-            else
-              echo "Nginx container not found, skipping restart"
-            fi
+            # Create the nginx repo inside $TEMP_DIR
+            NGINX_DIR="$TEMP_DIR/nginx"
+            mkdir -p "$NGINX_DIR"
+
+            # Change into the nginx repo
+            cd "$NGINX_DIR"
+
+            # Clone the nginx private repository using PAT
+            git clone https://${{ secrets.NGINX_EC2_PAT }}@github.com/codextraa/nginx-proxy.git .
+
+            # Create Certs directory
+            mkdir -p Certs
+
+            # Copy SSL certificates
+            echo "${{ secrets.EC2_SUDO_PASSWORD }}" | sudo -S cp -r /etc/ssl_certs/* Certs/ || { 
+              echo "Failed to copy SSL certificates from /etc/ssl_certs"; 
+              exit 1;
+            }
+
+            # Change ownership of Certs directory to ubuntu user
+            echo "${{ secrets.EC2_SUDO_PASSWORD }}" | sudo -S chown -R ubuntu:ubuntu Certs/ || { 
+              echo "Failed to change ownership of Certs directory"; 
+              exit 1; 
+            }
+
+            # Build the Docker image
+            docker-compose -p nginx build
+
+            # Run the container
+            docker-compose -p nginx up -d
+
+            # Wait for nginx to be ready
+            echo "Waiting for Nginx to be ready..."
+            timeout 60s bash -c "until curl -s -f http://localhost:80/ > /dev/null; do echo 'Nginx not ready yet...'; sleep 5s; done" || { 
+              echo "Nginx failed to start"; 
+              docker logs nginx; 
+              docker stop nginx || true; 
+              exit 1; 
+            }
+            echo "Nginx is ready!"
+
+            # Explicitly remove Certs directory and specific SSL files
+            rm -f Certs/cloudfare.crt Certs/cloudfare.key
+            rm -rf Certs
+
+            # Remove the nginx repo
+            rm -rf "$NGINX_DIR"
 
             # Cleanup
             cd /home/ubuntu
