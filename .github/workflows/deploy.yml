@@ -25,7 +25,7 @@ jobs:
             cd "$TEMP_DIR"
 
             # Clone the repository
-            git clone https://github.com/wasee-sun/To_do_app.git .
+            git clone https://github.com/codextraa/To_do_app.git .
 
             # Write secrets to files
             echo "${{ secrets.INFISICAL_TOKEN_PROD }}" > infisical_token.txt
