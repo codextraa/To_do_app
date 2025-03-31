@@ -44,7 +44,7 @@ jobs:
       - name: Checkout Postgres repository
         uses: actions/checkout@v4
         with:
-          repository: wasee-sun/postgres-db
+          repository: codextraa/postgres-db
           token: ${{ secrets.POSTGRES_REPO_PAT }}
           path: postgres-db
 
