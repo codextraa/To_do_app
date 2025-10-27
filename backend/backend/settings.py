@@ -141,10 +141,7 @@ STATIC_ROOT = "/app/static"
 
 # Media files
 if DJANGO_ENV == "development":
-    if HTTPS:
-        MEDIA_URL = "https://todo-app.dev.local/media/"
-    else:
-        MEDIA_URL = "/media/"
+    MEDIA_URL = "/media/"
     MEDIA_ROOT = "/app/media"
 else:
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
